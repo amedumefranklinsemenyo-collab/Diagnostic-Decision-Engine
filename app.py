@@ -233,7 +233,6 @@ if st.button("Generate PDF Report"):
     story.append(Paragraph(f"Date: {date}", styles["Normal"]))
     story.append(Spacer(1, 20))
 
-    # ✅ FIXED LINE ONLY
     bmi = calculate_bmi(weight, height)
 
     story.append(Paragraph(f"BMI: {bmi}", styles["Normal"]))
@@ -241,6 +240,12 @@ if st.button("Generate PDF Report"):
     story.append(Paragraph(f"Pulse: {pulse}", styles["Normal"]))
     story.append(Paragraph(f"Temperature: {temp}", styles["Normal"]))
     story.append(Spacer(1, 20))
+
+    # ✅ FIX: recompute advice in this scope
+    bmi_advice = get_advice("BMI",bmi)
+    spo2_advice = get_advice("SpO2",spo2)
+    pulse_advice = get_advice("Pulse",pulse)
+    temp_advice = get_advice("Temperature",temp)
 
     story.append(Paragraph("Clinical Advice", styles["Heading2"]))
     story.append(Paragraph(bmi_advice, styles["Normal"]))
