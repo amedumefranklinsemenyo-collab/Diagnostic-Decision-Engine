@@ -216,50 +216,46 @@ if st.button("Generate PDF Report"):
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import getSampleStyleSheet
 
-    # Ensure the reports folder exists
     if not os.path.exists("reports"):
         os.makedirs("reports")
 
-    # Define the PDF filename
     filename = f"reports/{name}_report.pdf"
 
     styles = getSampleStyleSheet()
     story = []
 
-    # Header
     story.append(Paragraph("Clinical Decision Report", styles["Title"]))
     story.append(Spacer(1, 20))
 
-    # Patient info
     story.append(Paragraph(f"Name: {name}", styles["Normal"]))
     story.append(Paragraph(f"Age: {age}", styles["Normal"]))
     story.append(Paragraph(f"Gender: {gender}", styles["Normal"]))
     story.append(Paragraph(f"Date: {date}", styles["Normal"]))
     story.append(Spacer(1, 20))
 
-    # Vital signs
+    # ✅ FIXED LINE ONLY
+    bmi = calculate_bmi(weight, height)
+
     story.append(Paragraph(f"BMI: {bmi}", styles["Normal"]))
     story.append(Paragraph(f"SpO₂: {spo2}", styles["Normal"]))
     story.append(Paragraph(f"Pulse: {pulse}", styles["Normal"]))
     story.append(Paragraph(f"Temperature: {temp}", styles["Normal"]))
     story.append(Spacer(1, 20))
 
-    # Clinical advice
     story.append(Paragraph("Clinical Advice", styles["Heading2"]))
     story.append(Paragraph(bmi_advice, styles["Normal"]))
     story.append(Paragraph(spo2_advice, styles["Normal"]))
     story.append(Paragraph(pulse_advice, styles["Normal"]))
     story.append(Paragraph(temp_advice, styles["Normal"]))
 
-    # Build PDF
     pdf = SimpleDocTemplate(filename, pagesize=letter)
     pdf.build(story)
 
-    # Open PDF automatically
     absolute_path = os.path.abspath(filename)
     webbrowser.open(f'file://{absolute_path}')
 
     st.success("PDF Report Generated and Opened")
+
 # =========================
 # PAGE 2 – PATIENT DATABASE
 # =========================
@@ -268,17 +264,14 @@ elif page == "Patient Database":
 
     st.header("🗄 Patient Records")
 
-    # Load database into a dataframe
     df = pd.read_sql_query("SELECT * FROM patients", conn)
     st.dataframe(df)
 
     st.markdown("---")
 
-    # Button to reset database
     if st.button("⚠ Clear Patient Database"):
         cursor.execute("DELETE FROM patients")
         conn.commit()
         st.warning("All patient records have been cleared!")
-        # Reload empty dataframe after deletion
         df = pd.read_sql_query("SELECT * FROM patients", conn)
         st.dataframe(df)
