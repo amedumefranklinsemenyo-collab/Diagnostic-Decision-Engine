@@ -10,13 +10,14 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 # ---------------- PAGE CONFIG ----------------
 
-st.set_page_config(
-    page_title="Clinical Decision Support System",
-    layout="wide"
-)
-
-st.title("🏥 Clinical Decision Support System")
-st.subheader("Franklin's Patient Vital Monitoring Dashboard")
+st.markdown("""
+<h3 style='font-size: 3vw; margin-bottom: 0;'>
+🏥 Clinical Decision Support System
+</h3>
+<p style='font-size: 2vw; margin-top: 0;'>
+Franklin's Patient Vital Monitoring Dashboard
+</p>
+""", unsafe_allow_html=True)
 
 # ---------------- FOLDERS ----------------
 
