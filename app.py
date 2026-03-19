@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 st.title("🏥 Clinical Decision Support System")
-st.subheader("AI-Enhanced Patient Vital Monitoring Dashboard")
+st.subheader("Franklin's Patient Vital Monitoring Dashboard")
 
 # ---------------- FOLDERS ----------------
 
@@ -211,16 +211,14 @@ if page == "Patient Analysis":
         # ---------------- PDF GENERATION ----------------
 if st.button("Generate PDF Report"):
     import os
-    import webbrowser
+    from io import BytesIO
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import getSampleStyleSheet
 
-    if not os.path.exists("reports"):
-        os.makedirs("reports")
-
-    filename = f"reports/{name}_report.pdf"
-
+    # Use in-memory buffer for PDF
+    buffer = BytesIO()
+    
     styles = getSampleStyleSheet()
     story = []
 
@@ -241,11 +239,11 @@ if st.button("Generate PDF Report"):
     story.append(Paragraph(f"Temperature: {temp}", styles["Normal"]))
     story.append(Spacer(1, 20))
 
-    # ✅ FIX: recompute advice in this scope
-    bmi_advice = get_advice("BMI",bmi)
-    spo2_advice = get_advice("SpO2",spo2)
-    pulse_advice = get_advice("Pulse",pulse)
-    temp_advice = get_advice("Temperature",temp)
+    # Recompute advice in this scope
+    bmi_advice = get_advice("BMI", bmi)
+    spo2_advice = get_advice("SpO2", spo2)
+    pulse_advice = get_advice("Pulse", pulse)
+    temp_advice = get_advice("Temperature", temp)
 
     story.append(Paragraph("Clinical Advice", styles["Heading2"]))
     story.append(Paragraph(bmi_advice, styles["Normal"]))
@@ -253,13 +251,22 @@ if st.button("Generate PDF Report"):
     story.append(Paragraph(pulse_advice, styles["Normal"]))
     story.append(Paragraph(temp_advice, styles["Normal"]))
 
-    pdf = SimpleDocTemplate(filename, pagesize=letter)
+    # Build PDF in memory
+    pdf = SimpleDocTemplate(buffer, pagesize=letter)
     pdf.build(story)
 
-    absolute_path = os.path.abspath(filename)
-    webbrowser.open(f'file://{absolute_path}')
+    # Move cursor to beginning of buffer
+    buffer.seek(0)
 
-    st.success("PDF Report Generated and Opened")
+    st.success("PDF Report Generated ✅")
+
+    # Provide download button
+    st.download_button(
+        label="Download PDF Report",
+        data=buffer,
+        file_name=f"{name}_report.pdf",
+        mime="application/pdf"
+    )
 
 # =========================
 # PAGE 2 – PATIENT DATABASE
